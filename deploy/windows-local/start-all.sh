@@ -206,19 +206,10 @@ cat > "$RUN_DIR/config/metadata-instances.json" <<JSON
 JSON
 
 # 端口预清理：残留监听（如上次异常退出）会导致新进程 EADDRINUSE，
-# 而 wait_health 会误命中旧监听。启动前先杀掉占用目标端口的进程。
+# 而 wait_health 会误命中旧监听。用 kill-ports.mjs（netstat+taskkill）——
+# 不要用 powershell：无控制台的 detached 上下文里 powershell 启动会挂起。
 echo "[info] 端口预清理: $MEMORY_CORE_PORT $KNOWLEDGE_PORT $PANEL_PORT $PROXY_PORT"
-powershell -NoProfile -Command "
-foreach (\$port in $MEMORY_CORE_PORT,$KNOWLEDGE_PORT,$PANEL_PORT,$PROXY_PORT) {
-  \$c = Get-NetTCPConnection -LocalPort \$port -State Listen -ErrorAction SilentlyContinue
-  if (\$c) {
-    foreach (\$procId in (\$c.OwningProcess | Sort-Object -Unique)) {
-      try { Stop-Process -Id \$procId -Force -ErrorAction Stop; Write-Output \"[warn] 端口 \$port 被残留进程 \$procId 占用，已终止\" }
-      catch { Write-Output \"[warn] 端口 \$port 进程 \$procId 终止失败: \$(\$_.Exception.Message)\" }
-    }
-  }
-}
-" || true
+node "$RUN_DIR/kill-ports.mjs" "$MEMORY_CORE_PORT" "$KNOWLEDGE_PORT" "$PANEL_PORT" "$PROXY_PORT" || true
 sleep 1
 
 # ══ Step 1/4: memory-core ═══════════════════════════════════
