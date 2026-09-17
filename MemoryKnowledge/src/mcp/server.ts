@@ -89,8 +89,12 @@ export function createMcpServer(httpOpts: HttpClientOptions): Server {
   return server;
 }
 
-// Start server when run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Start server when run directly（pathToFileURL 兼容 Windows 的 file:///E:/ 形式）
+import { pathToFileURL } from "node:url";
+const invokedDirectly =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href;
+if (invokedDirectly) {
   const baseUrl = process.env.KNOWLEDGE_API_URL || "http://localhost:8421";
   const token = process.env.KNOWLEDGE_API_TOKEN;
 

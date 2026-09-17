@@ -146,7 +146,13 @@ async function startServer(): Promise<void> {
 }
 
 // Start server when run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Windows 下 import.meta.url 是 file:///E:/... 三斜杠，而 `file://${argv[1]}` 只有
+// 两斜杠，永远不相等导致进程静默退出 —— 必须用 pathToFileURL 规范化后比较。
+import { pathToFileURL } from "node:url";
+const invokedDirectly =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href;
+if (invokedDirectly) {
   void startServer().catch((err) => {
     log.error("Knowledge service failed to start", {
       error: err instanceof Error ? err.message : String(err),
