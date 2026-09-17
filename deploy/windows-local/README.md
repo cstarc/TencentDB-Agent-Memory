@@ -1,8 +1,7 @@
 # TencentDB-Agent-Memory 本机源码部署（Windows / 无 Docker）
 
-> 本目录是仓库内置的 Windows 无 Docker 部署套件（deploy/windows-local）。把整个目录复制到任意工作目录（本文以 E:/tam/run 为例）使用；
-> 运行时生成的 .env、config/、data/、logs/ 均不入库，真实 API key 不要提交进 git。
-参考 https://github.com/TencentCloud/TencentDB-Agent-Memory 搭建，在 Windows 上**不经 Docker、直接用 Node 从源码运行**全套服务。
+参考 https://github.com/TencentCloud/TencentDB-Agent-Memory 搭建，本目录 `E:\tam\run`
+包含在 Windows 上**不经 Docker、直接用 Node 从源码运行**全套服务所需的配置与脚本。
 
 ## 服务与端口
 
@@ -20,6 +19,14 @@ cd /e/tam/run
 ./start-all.sh   # 启动全部四个服务（含端口预清理、init-admin）
 ./stop-all.sh    # 按端口停止全部服务
 ```
+
+也可以用桌面图标 **「TAM 服务管理」**：双击后自动确保控制台服务在运行，并打开浏览器
+页面 **http://127.0.0.1:8127** —— 网页里有四个服务的状态灯、"启动全部服务 / 停止全部
+服务"按钮（操作期间按钮自动禁用）、操作日志框和管理面板等快捷链接。组成：
+`control-center.mjs`（本地 web 控制台，仅监听 127.0.0.1）+ `tam-console.bat`（双击入口）。
+不依赖任何桌面窗口机制，浏览器渲染，重启电脑后双击图标即可恢复。
+
+> 注意：服务不会开机自启。重启电脑后，双击桌面图标 → 页面里点"启动全部服务"即可。
 
 - 配置：编辑 `.env` 后重新 `./start-all.sh`
 - 日志：`logs/{core,knowledge,panel,proxy}.log`
