@@ -1,0 +1,8 @@
+# 本地运行产物与敏感信息，永不提交
+.env
+.admin-key
+config/
+data/
+logs/
+pids/
+node_modules/
